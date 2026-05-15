@@ -32,10 +32,13 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
     def generate_otp(self):
-        self.otp = ''.join(random.choices(string.digits, k=6))
+        otp = str(random.randint(100000, 999999))
+
+        self.otp = otp
         self.otp_created_at = timezone.now()
         self.save()
-        return self.otp
+
+        return otp
 
     # ✅ FIXED
     def is_otp_valid(self, entered_otp):

@@ -184,68 +184,96 @@ def about(request):
 # AUTHENTICATION VIEWS (ERROR FREE)
 # Replace old auth views in views.py
 # ═══════════════════════════════════════════════════════════
+# ============================================
+# SIGNUP VIEW (OTP SHOW ON WEBSITE PAGE)
+# Replace old signup_view in views.py
+# ============================================
 
 from django.db import transaction
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+
+from .models import UserProfile
+from .forms import SignupForm
+
 
 def signup_view(request):
+
+    # If already logged in
     if request.user.is_authenticated:
         return redirect('home')
 
     form = SignupForm()
 
+    # POST REQUEST
     if request.method == 'POST':
+
         form = SignupForm(request.POST)
 
+        # VALID FORM
         if form.is_valid():
+
             try:
                 with transaction.atomic():
 
-                    user = form.save()
+                    # Create User
+                    user = form.save(commit=False)
                     user.is_active = False
                     user.save()
 
+                    # Create Profile
                     profile, created = UserProfile.objects.get_or_create(
                         user=user
                     )
 
+                    # Save Mobile
                     profile.mobile = form.cleaned_data['mobile']
                     profile.save()
 
+                    # Generate OTP
                     otp = profile.generate_otp()
 
-                    send_mail(
-                        'OGTRMS OTP Verification',
-                        f'Your OTP is: {otp}',
-                        settings.DEFAULT_FROM_EMAIL,
-                        [user.email],
-                        fail_silently=True
-                    )
-
+                    # Store User ID in Session
                     request.session['verify_user_id'] = user.id
 
+                    # ===================================
+                    # SHOW OTP ON WEBSITE PAGE
+                    # ===================================
                     messages.success(
                         request,
-                        "OTP sent to your email."
+                        f'Account created successfully! Your OTP is: {otp}'
                     )
 
+                    # Redirect to Verify Page
                     return redirect('verify_email')
 
             except Exception as e:
-                print(e)
+
+                print("SIGNUP ERROR:", e)
+
                 messages.error(
                     request,
-                    "Account creation failed."
+                    "Account creation failed. Please try again."
                 )
 
         else:
-            print(form.errors)
 
+            print("FORM ERRORS:", form.errors)
+
+            messages.error(
+                request,
+                "Please correct the form errors."
+            )
+
+    # Render Signup Page
     return render(
         request,
         'core/auth/signup.html',
-        {'form': form}
+        {
+            'form': form
+        }
     )
-
 def verify_email(request):
     user_id = request.session.get('verify_user_id')
 
