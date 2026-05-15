@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Error - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="section-padding" style="min-height:70vh;display:flex;align-items:center;">
+    <div class="container text-center">
+        <div style="font-size:8rem;margin-bottom:1rem;">
+            {% if status == 404 %}🔍{% else %}⚠️{% endif %}
+        </div>
+        
+        <h1 class="display-1 fw-bold text-neon mb-2">
+            {% if status == 404 %}404{% else %}500{% endif %}
+        </h1>
+        
+        <h2 class="mb-3">
+            {% if status == 404 %}Page Not Found{% else %}Server Error{% endif %}
+        </h2>
+        
+        <p class="text-muted lead mb-4" style="max-width:600px;margin-left:auto;margin-right:auto;">
+            {% if status == 404 %}
+                The page you're looking for doesn't exist or has been moved. 
+                Check the URL or use navigation below.
+            {% else %}
+                Something went wrong on our end. We're working to fix it. 
+                Please try again later.
+            {% endif %}
+        </p>
+        
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="/" class="btn btn-neon px-4 py-2">
+                <i class="fas fa-home me-2"></i>Go to Homepage
+            </a>
+            <a href="/tournaments/" class="btn btn-outline-neon px-4 py-2">
+                <i class="fas fa-trophy me-2"></i>Browse Tournaments
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

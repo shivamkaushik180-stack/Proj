@@ -1,0 +1,223 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Admin Dashboard - OGTRMS
+{% endblock %}
+
+{% block content %}
+  <section class="admin-header">
+    <div class="container">
+      <h1 class="page-banner-title mb-2"><i class="fas fa-cog me-2"></i>Admin Dashboard</h1>
+      <p class="text-muted">Manage tournaments, registrations, users & view analytics</p>
+    </div>
+  </section>
+
+  <section class="section-padding">
+    <div class="container">
+      <!-- Stats Row -->
+      <div class="row g-4 mb-5">
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-cyan);">
+            <div class="stat-icon" style="background:rgba(0,245,255,0.1);">
+              <i class="fas fa-users text-neon"></i>
+            </div>
+            <span class="stat-num" data-count="{{ total_users }}">{{ total_users }}</span>
+            <span class="stat-label">Total Users</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-green);">
+            <div class="stat-icon" style="background:rgba(57,255,20,0.1);">
+              <i class="fas fa-trophy text-neon-green"></i>
+            </div>
+            <span class="stat-num" data-count="{{ total_tournaments }}">{{ total_tournaments }}</span>
+            <span class="stat-label">Tournaments</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-pink);">
+            <div class="stat-icon" style="background:rgba(255,0,110,0.1);">
+              <i class="fas fa-clipboard text-neon-pink"></i>
+            </div>
+            <span class="stat-num" data-count="{{ total_registrations }}">{{ total_registrations }}</span>
+            <span class="stat-label">Registrations</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-yellow);">
+            <div class="stat-icon" style="background:rgba(255,215,0,0.1);">
+              <i class="fas fa-credit-card text-neon-yellow"></i>
+            </div>
+            <span class="stat-num">₹{{ total_revenue|floatformat:0 }}</span>
+            <span class="stat-label">Revenue</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-green);">
+            <div class="stat-icon" style="background:rgba(57,255,20,0.1);">
+              <i class="fas fa-check text-neon-green"></i>
+            </div>
+            <span class="stat-num" data-count="{{ pending_payments }}">{{ pending_payments }}</span>
+            <span class="stat-label">Pending Payments</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card" style="--accent-color:var(--neon-orange);">
+            <div class="stat-icon" style="background:rgba(255,107,0,0.1);">
+              <i class="fas fa-clock text-neon-orange"></i>
+            </div>
+            <span class="stat-num" data-count="{{ pending_registrations }}">{{ pending_registrations }}</span>
+            <span class="stat-label">Pending Registrations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-5">
+        <!-- Quick Stats -->
+        <div class="col-lg-3">
+          <div class="card-gaming p-4">
+            <h5 class="mb-3"><i class="fas fa-flash me-2"></i>Quick Stats</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2 d-flex justify-content-between">
+                <span>Live Tournaments</span>
+                <strong class="text-neon-green">{{ live_tournaments }}</strong>
+              </li>
+              <li class="mb-2 d-flex justify-content-between">
+                <span>Upcoming</span>
+                <strong class="text-neon">{{ upcoming_tournaments }}</strong>
+              </li>
+              <li class="mb-2 d-flex justify-content-between">
+                <span>Approved Registrations</span>
+                <strong class="text-neon-green">0</strong>
+              </li>
+              <li class="mb-2 d-flex justify-content-between">
+                <span>Total Revenue</span>
+                <strong class="text-neon-yellow">₹{{ total_revenue|floatformat:0 }}</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Game Popularity -->
+        <div class="col-lg-3">
+          <div class="card-gaming p-4">
+            <h5 class="mb-3"><i class="fas fa-chart-bar me-2"></i>Game Popularity</h5>
+            <ul class="list-unstyled">
+              {% for stat in game_stats %}
+                <li class="mb-2">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="small">{{ stat.game__display_name }}</span>
+                    <strong class="text-neon-cyan">{{ stat.total }}</strong>
+                  </div>
+                  <div class="slot-bar">
+                    <div class="slot-fill" style="width:{{ stat.total }}%;"></div>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-6">
+          <div class="card-gaming p-4">
+            <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            <div class="d-grid gap-2">
+              <a href="{% url 'admin_tournament_add' %}" class="btn btn-neon"><i class="fas fa-plus me-2"></i>Create Tournament</a>
+              <a href="{% url 'admin_registrations' %}" class="btn btn-outline-neon"><i class="fas fa-list me-2"></i>View Registrations</a>
+              <a href="{% url 'admin_users' %}" class="btn btn-outline-neon">
+                <i class="fas fa-users me-2"></i>Manage Users
+                <a href="{% url 'admin_games' %}" class="btn btn-outline-neon"><i class="fas fa-gamepad me-2"></i>Manage Games</a>
+
+                <a href="{% url 'admin_game_add' %}" class="btn btn-neon"><i class="fas fa-plus me-2"></i>Add Game</a>
+              </a>
+              <a href="{% url 'admin_reports' %}" class="btn btn-outline-neon"><i class="fas fa-chart-line me-2"></i>View Reports</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Registrations -->
+      <div class="card-gaming p-4 mb-5">
+        <h4 class="mb-3"><i class="fas fa-list me-2"></i>Recent Registrations</h4>
+        {% if recent_registrations %}
+          <div class="table-responsive">
+            <table class="table table-gaming">
+              <thead>
+                <tr>
+                  <th>Reg No.</th>
+                  <th>Player Name</th>
+                  <th>Tournament</th>
+                  <th>Reg. Status</th>
+                  <th>Payment</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for reg in recent_registrations %}
+                  <tr>
+                    <td class="text-neon fw-bold" style="font-size:0.9rem;">{{ reg.registration_number }}</td>
+                    <td class="fw-bold">{{ reg.full_name }}</td>
+                    <td class="text-muted small">{{ reg.tournament.title|truncatewords:3 }}</td>
+                    <td>
+                      <span class="status-pill pill-{{ reg.registration_status }}">{{ reg.get_registration_status_display }}</span>
+                    </td>
+                    <td>
+                      <span class="status-pill pill-{{ reg.payment_status }}">{{ reg.get_payment_status_display }}</span>
+                    </td>
+                    <td class="text-end">
+                      <a href="{% url 'admin_registration_detail' reg.pk %}" class="btn btn-sm btn-outline-neon">Details</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No recent registrations</p>
+        {% endif %}
+      </div>
+
+      <!-- Admin Navigation -->
+      <div class="row g-3">
+        <div class="col-md-3">
+          <a href="{% url 'admin_tournaments' %}" class="card-gaming p-4 text-decoration-none d-block text-center">
+            <i class="fas fa-trophy text-neon-yellow" style="font-size:2rem;margin-bottom:1rem;"></i>
+            <h5 class="text-white">Manage Tournaments</h5>
+            <p class="text-muted small mb-0">{{ total_tournaments }} tournaments</p>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'admin_registrations' %}" class="card-gaming p-4 text-decoration-none d-block text-center">
+            <i class="fas fa-clipboard text-neon" style="font-size:2rem;margin-bottom:1rem;"></i>
+            <h5 class="text-white">Registrations</h5>
+            <p class="text-muted small mb-0">{{ total_registrations }} registrations</p>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'admin_users' %}" class="card-gaming p-4 text-decoration-none d-block text-center">
+            <i class="fas fa-users text-neon-green" style="font-size:2rem;margin-bottom:1rem;"></i>
+            <h5 class="text-white">Users</h5>
+            <p class="text-muted small mb-0">{{ total_users }} users</p>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'admin_reports' %}" class="card-gaming p-4 text-decoration-none d-block text-center">
+            <i class="fas fa-chart-line text-neon-pink" style="font-size:2rem;margin-bottom:1rem;"></i>
+            <h5 class="text-white">Reports</h5>
+            <p class="text-muted small mb-0">Analytics & Reports</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

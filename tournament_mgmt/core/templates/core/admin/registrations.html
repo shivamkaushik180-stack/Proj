@@ -1,0 +1,231 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Manage Registrations - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="admin-header">
+    <div class="container">
+        <h1 class="page-banner-title mb-0">
+            <i class="fas fa-clipboard me-2"></i>Manage Registrations
+        </h1>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+
+        <!-- Filters -->
+        <div class="card-gaming p-4 mb-4">
+            <h5 class="mb-3">Filters</h5>
+
+            <form method="GET" class="row g-3">
+
+                <!-- Search -->
+                <div class="col-md-3">
+                    <input type="text"
+                           name="q"
+                           class="form-control"
+                           placeholder="Search by name/reg no/tournament"
+                           value="{{ q }}">
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+
+                        <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>
+                            Pending
+                        </option>
+
+                        <option value="APPROVED" {% if status_filter == 'APPROVED' %}selected{% endif %}>
+                            Approved
+                        </option>
+
+                        <option value="REJECTED" {% if status_filter == 'REJECTED' %}selected{% endif %}>
+                            Rejected
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Payment Filter -->
+                <div class="col-md-2">
+                    <select name="payment" class="form-select">
+                        <option value="">All Payments</option>
+
+                        <option value="PENDING" {% if payment_filter == 'PENDING' %}selected{% endif %}>
+                            Pending
+                        </option>
+
+                        <option value="VERIFIED" {% if payment_filter == 'VERIFIED' %}selected{% endif %}>
+                            Verified
+                        </option>
+
+                        <option value="REJECTED" {% if payment_filter == 'REJECTED' %}selected{% endif %}>
+                            Rejected
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Filter Button -->
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-neon w-100">
+                        Filter
+                    </button>
+                </div>
+
+                <!-- Reset -->
+                <div class="col-md-2">
+                    <a href="{% url 'admin_registrations' %}" class="btn btn-outline-neon w-100">
+                        Reset
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="card-gaming p-4">
+
+            <div class="table-responsive">
+                <table class="table table-gaming">
+
+                    <thead>
+                        <tr>
+                            <th>Reg No.</th>
+                            <th>Player Name</th>
+                            <th>Tournament</th>
+                            <th>Email</th>
+                            <th>Reg Status</th>
+                            <th>Payment Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for registration in registrations %}
+                        <tr>
+
+                            <td class="text-neon fw-bold text-monospace">
+                                {{ registration.registration_number }}
+                            </td>
+
+                            <td class="fw-bold">
+                                {{ registration.full_name }}
+                            </td>
+
+                            <td class="text-muted small">
+                                {{ registration.tournament.title|truncatewords:3 }}
+                            </td>
+
+                            <td class="text-muted small">
+                                {{ registration.email }}
+                            </td>
+
+                            <td>
+                                <span class="status-pill pill-{{ registration.registration_status|lower }}">
+                                    {{ registration.get_registration_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-pill pill-{{ registration.payment_status|lower }}">
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                <!-- APPROVE -->
+                                <form method="POST"
+                                      action="{% url 'admin_approve_registration' registration.pk %}"
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Approve
+                                    </button>
+                                </form>
+
+                                <!-- REJECT -->
+                                <form method="POST"
+                                      action="{% url 'admin_reject_registration' registration.pk %}"
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        Reject
+                                    </button>
+                                </form>
+
+                            </td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                No registrations found
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if registrations.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+
+                    {% if registrations.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page=1&q={{ q }}&status={{ status_filter }}&payment={{ payment_filter }}">
+                            First
+                        </a>
+                    </li>
+
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ registrations.previous_page_number }}&q={{ q }}&status={{ status_filter }}&payment={{ payment_filter }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ registrations.number }}
+                        </span>
+                    </li>
+
+                    {% if registrations.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ registrations.next_page_number }}&q={{ q }}&status={{ status_filter }}&payment={{ payment_filter }}">
+                            Next
+                        </a>
+                    </li>
+
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ registrations.paginator.num_pages }}&q={{ q }}&status={{ status_filter }}&payment={{ payment_filter }}">
+                            Last
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+            {% endif %}
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

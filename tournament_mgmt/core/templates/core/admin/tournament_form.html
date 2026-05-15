@@ -1,0 +1,195 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Tournament - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="admin-header">
+    <div class="container">
+        <h1 class="page-banner-title mb-0">
+            <i class="fas fa-plus me-2"></i>{{ action }} Tournament
+        </h1>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="card-gaming p-4">
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Title + Game -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tournament Title *</label>
+                                {{ form.title }}
+                                {{ form.title.errors }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Game *</label>
+                                {{ form.game }}
+                                {{ form.game.errors }}
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            {{ form.description }}
+                            {{ form.description.errors }}
+                        </div>
+
+                        <!-- Type Status Slots -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tournament Type *</label>
+                                {{ form.tournament_type }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status *</label>
+                                {{ form.status }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Total Slots *</label>
+                                {{ form.total_slots }}
+                            </div>
+                        </div>
+
+                        <!-- Fees -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Entry Fee *</label>
+                                {{ form.entry_fee }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prize Pool *</label>
+                                {{ form.prize_pool }}
+                            </div>
+                        </div>
+
+                        <!-- Prize -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">1st Prize</label>
+                                {{ form.first_prize }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">2nd Prize</label>
+                                {{ form.second_prize }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">3rd Prize</label>
+                                {{ form.third_prize }}
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Date *</label>
+                                {{ form.start_date }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Date *</label>
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Registration Deadline *</label>
+                            {{ form.registration_deadline }}
+                        </div>
+
+                        <!-- Room -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Room ID</label>
+                                {{ form.room_id }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Room Password</label>
+                                {{ form.room_password }}
+                            </div>
+                        </div>
+
+                        <!-- Map + UPI -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Map Name</label>
+                                {{ form.map_name }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">UPI ID</label>
+                                {{ form.upi_id }}
+                            </div>
+                        </div>
+
+                        <!-- Rules -->
+                        <div class="mb-3">
+                            <label class="form-label">Rules</label>
+                            {{ form.rules }}
+                        </div>
+
+                        <!-- Banner -->
+                        <div class="mb-3">
+                            <label class="form-label">Banner Image</label>
+                            {{ form.banner_image }}
+
+                            {% if action == 'Edit' and form.instance.banner_image %}
+                                <div class="mt-2">
+                                    <img src="{{ form.instance.banner_image.url }}"
+                                         width="150"
+                                         class="rounded shadow">
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- FIXED CHECKBOX -->
+                        <div class="form-check mb-4">
+                            {{ form.is_featured }}
+                            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                Featured Tournament
+                            </label>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-neon py-2 fw-bold">
+                                <i class="fas fa-save me-2"></i>{{ action }} Tournament
+                            </button>
+
+                            <a href="{% url 'admin_tournaments' %}" class="btn btn-outline-light">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}OGTRMS - Online Gaming Tournament Registration & Management System{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero-section py-5" style="min-height:100vh;display:flex;align-items:center;">
+    <div class="container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-7">
+
+                <h1 class="display-3 fw-bold text-white mb-3">
+                    DOMINATE THE <br>
+                    <span class="text-info">LEADERBOARD</span><br>
+                    WIN BIG 🏆
+                </h1>
+
+                <p class="lead text-light mb-4">
+                    Join India's premier online gaming tournament platform.
+                    Register for BGMI, Free Fire, Valorant & more.
+                </p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-4">
+                        <div class="card-gaming p-3 text-center">
+                            <h3 class="text-info">{{ total_tournaments }}+</h3>
+                            <small>Tournaments</small>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="card-gaming p-3 text-center">
+                            <h3 class="text-info">{{ total_users }}+</h3>
+                            <small>Players</small>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="card-gaming p-3 text-center">
+                            <h3 class="text-info">₹{{ total_prize|floatformat:0 }}+</h3>
+                            <small>Prize Pool</small>
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'tournaments_list' %}" class="btn btn-primary btn-lg me-2">
+                        Browse Tournaments
+                    </a>
+                {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-success btn-lg me-2">
+                        Join Now
+                    </a>
+                {% endif %}
+
+            </div>
+
+            <div class="col-lg-5 text-center">
+                <div style="font-size:10rem;">🏆</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- GAMES SECTION -->
+<section class="py-5 bg-dark">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="text-white">Choose Your Battle</h2>
+            <p class="text-muted">Play top games and win rewards</p>
+        </div>
+
+        <div class="row g-3">
+
+            {% for item in default_games %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card-gaming p-3 text-center h-100">
+                    <div style="font-size:2rem;">🎮</div>
+                    <h6 class="text-white mt-2">{{ item }}</h6>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- TOURNAMENT SECTION -->
+<section class="py-5">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-white">Upcoming Tournaments</h2>
+
+            <a href="{% url 'tournaments_list' %}" class="btn btn-outline-light">
+                View All
+            </a>
+        </div>
+
+        <div class="row g-4">
+
+            {% for t in upcoming %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card-gaming p-4 h-100">
+
+                    <h5 class="text-white">{{ t.title }}</h5>
+
+                    <p class="text-muted mb-2">
+                        {{ t.game.display_name }}
+                    </p>
+
+                    <p class="text-warning">
+                        Prize Pool: ₹{{ t.prize_pool }}
+                    </p>
+
+                    <p class="text-light small">
+                        {{ t.start_date|date:"d M Y h:i A" }}
+                    </p>
+
+                    <a href="{% url 'tournament_detail' t.pk %}" class="btn btn-primary w-100">
+                        View Tournament
+                    </a>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">
+                No tournaments available yet.
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+{% if not user.is_authenticated %}
+<section class="py-5 bg-dark">
+    <div class="container text-center">
+
+        <h2 class="text-white mb-3">Ready to Compete? 🚀</h2>
+
+        <p class="text-muted mb-4">
+            Join {{ total_users }}+ gamers already on the platform.
+        </p>
+
+        <a href="{% url 'signup' %}" class="btn btn-success btn-lg">
+            Create Free Account
+        </a>
+
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

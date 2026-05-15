@@ -1,0 +1,182 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Register - {{ tournament.title }} - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container text-center">
+        <h1 class="page-banner-title">
+            <i class="fas fa-gamepad me-2"></i>Register for Tournament
+        </h1>
+        <p class="text-muted">{{ tournament.title }}</p>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Tournament Card -->
+                <div class="card-gaming p-4 mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Tournament</small>
+                            <h4 class="text-white mt-2">{{ tournament.title }}</h4>
+                            <small class="text-muted">{{ tournament.game.display_name }}</small>
+                        </div>
+
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <small class="text-muted">Prize Pool</small>
+                            <div class="prize-tag">₹{{ tournament.prize_pool }}</div>
+
+                            <small class="text-muted">
+                                Entry Fee:
+                                {% if tournament.is_free %}
+                                    FREE
+                                {% else %}
+                                    ₹{{ tournament.entry_fee }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="card-gaming p-4">
+                    <h3 class="mb-4 text-neon">
+                        📝 Registration Form
+                    </h3>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- FORM ERRORS -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Personal -->
+                        <fieldset class="mb-4">
+                            <legend class="text-neon">
+                                <i class="fas fa-user me-2"></i>Personal Info
+                            </legend>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    {{ form.full_name }}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    {{ form.email }}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mobile</label>
+                                    {{ form.mobile }}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tournament Type</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="{{ tournament.get_tournament_type_display }}"
+                                           disabled>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Game -->
+                        <fieldset class="mb-4">
+                            <legend class="text-neon">
+                                <i class="fas fa-gamepad me-2"></i>In Game Info
+                            </legend>
+
+                            <div class="mb-3">
+                                <label class="form-label">Player UID</label>
+                                {{ form.ingame_uid }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">In Game Name</label>
+                                {{ form.ingame_name }}
+                            </div>
+
+                            {% if tournament.tournament_type != 'SOLO' %}
+                            <div class="mb-3">
+                                <label class="form-label">Team Name</label>
+                                {{ form.team_name }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Team Members</label>
+                                {{ form.team_members }}
+                            </div>
+                            {% endif %}
+                        </fieldset>
+
+                        <!-- Payment -->
+                        {% if not tournament.is_free %}
+                        <fieldset class="mb-4">
+                            <legend class="text-warning">
+                                <i class="fas fa-credit-card me-2"></i>Payment
+                            </legend>
+
+                            <div class="alert alert-info">
+                                Send ₹{{ tournament.entry_fee }}
+                                to <strong>{{ tournament.upi_id }}</strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Payment Screenshot</label>
+                                {{ form.payment_screenshot }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Transaction ID</label>
+                                {{ form.payment_reference }}
+                            </div>
+                        </fieldset>
+                        {% endif %}
+
+                        <!-- Terms -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   required
+                                   id="terms">
+
+                            <label class="form-check-label" for="terms">
+                                I agree to all tournament terms & rules.
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid gap-2">
+                            <button type="submit"
+                                    class="btn btn-neon btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Complete Registration
+                            </button>
+
+                            <a href="{% url 'tournament_detail' tournament.pk %}"
+                               class="btn btn-outline-light">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

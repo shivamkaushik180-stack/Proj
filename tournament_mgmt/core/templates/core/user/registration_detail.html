@@ -1,0 +1,208 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Registration Details - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h1 class="page-banner-title mb-0"><i class="fas fa-receipt me-2"></i>Registration Details</h1>
+            <span class="status-badge status-{{ registration.registration_status }}">{{ registration.get_registration_status_display }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Details -->
+            <div class="col-lg-8">
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">📋 Registration Details</h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small">Registration Number</span>
+                            <div class="text-white fw-bold">{{ registration.registration_number }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Tournament</span>
+                            <div class="text-white fw-bold">{{ registration.tournament.title }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Game</span>
+                            <div class="text-white fw-bold">{{ registration.tournament.game.display_name }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Tournament Type</span>
+                            <div class="text-white fw-bold">{{ registration.tournament.get_tournament_type_display }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Registered On</span>
+                            <div class="text-white fw-bold">{{ registration.registered_at|date:"d M Y, h:i A" }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Entry Fee</span>
+                            <div class="text-neon-yellow fw-bold">{% if registration.tournament.is_free %}FREE{% else %}₹{{ registration.tournament.entry_fee }}{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">👤 Personal Information</h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small">Full Name</span>
+                            <div class="text-white fw-bold">{{ registration.full_name }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Email</span>
+                            <div class="text-white fw-bold">{{ registration.email }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Mobile</span>
+                            <div class="text-white fw-bold">{{ registration.mobile }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In-Game Information -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">🎮 In-Game Information</h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small">In-Game UID</span>
+                            <div class="text-white fw-bold">{{ registration.ingame_uid }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">In-Game Name</span>
+                            <div class="text-white fw-bold">{{ registration.ingame_name }}</div>
+                        </div>
+                        {% if registration.team_name %}
+                        <div class="col-md-6">
+                            <span class="text-muted small">Team Name</span>
+                            <div class="text-white fw-bold">{{ registration.team_name }}</div>
+                        </div>
+                        {% endif %}
+                        {% if registration.team_members %}
+                        <div class="col-12">
+                            <span class="text-muted small">Team Members</span>
+                            <div class="text-white fw-bold">
+                                {% for member in registration.team_members_list %}
+                                <span class="badge bg-secondary me-2 mb-2">{{ member }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">✅ Status</h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small">Registration Status</span>
+                            <div class="mt-2">
+                                <span class="status-pill pill-{{ registration.registration_status }}">
+                                    {{ registration.get_registration_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Payment Status</span>
+                            <div class="mt-2">
+                                <span class="status-pill pill-{{ registration.payment_status }}">
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                {% if registration.tournament.entry_fee > 0 %}
+                <div class="card-gaming p-4">
+                    <h4 class="mb-3">💳 Payment Information</h4>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <span class="text-muted small">Entry Fee</span>
+                            <div class="text-neon-yellow fw-bold">₹{{ registration.tournament.entry_fee }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">Payment Reference</span>
+                            <div class="text-white fw-bold">{{ registration.payment_reference|default:"Not provided" }}</div>
+                        </div>
+                    </div>
+
+                    {% if registration.payment_screenshot %}
+                    <div>
+                        <span class="text-muted small">Payment Screenshot</span>
+                        <div class="mt-2">
+                            <img src="{{ registration.payment_screenshot.url }}" alt="Payment Screenshot" class="img-fluid rounded" style="max-height:250px;">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card-gaming p-4 mb-4">
+                    <h5 class="mb-3">⚡ Actions</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'download_receipt' registration.pk %}" class="btn btn-neon">
+                            <i class="fas fa-download me-2"></i>Download Receipt
+                        </a>
+                        <a href="{% url 'tournament_detail' registration.tournament.pk %}" class="btn btn-outline-neon">
+                            <i class="fas fa-eye me-2"></i>View Tournament
+                        </a>
+                        <a href="{% url 'my_registrations' %}" class="btn btn-outline-neon">
+                            <i class="fas fa-arrow-left me-2"></i>Back to My Registrations
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tournament Info -->
+                <div class="card-gaming p-4 mb-4">
+                    <h5 class="mb-3">🏆 Tournament Info</h5>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="text-muted small">Start Date:</span>
+                            <div class="text-white small fw-bold">{{ registration.tournament.start_date|date:"d M Y" }}</div>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small">Start Time:</span>
+                            <div class="text-white small fw-bold">{{ registration.tournament.start_date|date:"h:i A" }}</div>
+                        </li>
+                        <li>
+                            <span class="text-muted small">Prize Pool:</span>
+                            <div class="text-neon-yellow small fw-bold">₹{{ registration.tournament.prize_pool }}</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Support -->
+                <div class="card-gaming p-4">
+                    <h5 class="mb-3">📞 Need Help?</h5>
+                    <p class="text-muted small mb-3">If you have any questions about your registration, contact our support team.</p>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-neon w-100">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

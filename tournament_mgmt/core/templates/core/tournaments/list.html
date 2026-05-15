@@ -1,0 +1,188 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Tournaments - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h1 class="page-banner-title mb-0"><i class="fas fa-trophy me-2"></i>All Tournaments</h1>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="status-pill pill-UPCOMING">Upcoming</span>
+                <span class="status-pill pill-APPROVED">Live</span>
+                <span class="text-muted small">{{ tournaments.paginator.count }} tournaments found</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Filters -->
+            <div class="col-lg-3">
+                <div class="card-gaming p-4">
+                    <h5 class="mb-3"><i class="fas fa-filter me-2 text-neon"></i>Filters</h5>
+                    
+                    <form method="GET" class="needs-validation">
+                        <!-- Search -->
+                        <div class="mb-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" name="q" value="{{ q }}" id="tournamentSearch" class="form-control" placeholder="Tournament name...">
+                        </div>
+                        
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="UPCOMING" {% if status_filter == 'UPCOMING' %}selected{% endif %}>Upcoming</option>
+                                <option value="LIVE" {% if status_filter == 'LIVE' %}selected{% endif %}>Live</option>
+                                <option value="COMPLETED" {% if status_filter == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Entry Fee -->
+                        <div class="mb-3">
+                            <label class="form-label">Entry Fee</label>
+                            <select name="fee" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="free" {% if fee_filter == 'free' %}selected{% endif %}>Free Entry</option>
+                                <option value="paid" {% if fee_filter == 'paid' %}selected{% endif %}>Paid Entry</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Game -->
+                        <div class="mb-3">
+                            <label class="form-label">Game</label>
+                            <select name="game" class="form-select">
+                                <option value="">All Games</option>
+                                {% for game in games %}
+                                <option value="{{ game.name }}" {% if game_filter == game.name %}selected{% endif %}>
+                                    {{ game.display_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-neon w-100 mb-2">
+                            <i class="fas fa-search me-2"></i>Apply Filters
+                        </button>
+                        <a href="{% url 'tournaments_list' %}" class="btn btn-outline-neon w-100">
+                            <i class="fas fa-redo me-2"></i>Reset
+                        </a>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tournaments Grid -->
+            <div class="col-lg-9">
+                {% if tournaments %}
+                <div class="row g-4">
+                    {% for tournament in tournaments %}
+                    <div class="col-md-6 col-lg-6">
+                        <div class="tournament-card">
+                            <!-- Banner -->
+                            <div class="game-banner-placeholder {% if 'BGMI' in tournament.game.name %}game-bgmi{% elif 'FREE' in tournament.game.name %}game-ff{% elif 'VALORANT' in tournament.game.name %}game-valorant{% elif 'PUBG' in tournament.game.name %}game-pubg{% elif 'COD' in tournament.game.name %}game-cod{% else %}game-fifa{% endif %}">
+                                <div class="position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-start">
+                                    <span class="status-badge status-{{ tournament.status }}">
+                                        {% if tournament.status == 'LIVE' %}🔴{% elif tournament.status == 'UPCOMING' %}⏳{% else %}✅{% endif %}
+                                        {{ tournament.get_status_display }}
+                                    </span>
+                                    {% if tournament.is_free %}<span class="fee-badge fee-free">FREE</span>{% else %}<span class="fee-badge fee-paid">₹{{ tournament.entry_fee }}</span>{% endif %}
+                                </div>
+                                <div style="font-size:4rem;z-index:1;position:relative;">
+                                    {% if 'BGMI' in tournament.game.name %}🔫{% elif 'FREE' in tournament.game.name %}🔥{% elif 'VALORANT' in tournament.game.name %}🎯{% elif 'PUBG' in tournament.game.name %}🪖{% elif 'COD' in tournament.game.name %}💀{% else %}⚽{% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="text-muted small">{{ tournament.game.display_name }}</span>
+                                        <h5 class="mb-0 text-white">{{ tournament.title }}</h5>
+                                    </div>
+                                    <span class="badge bg-secondary">{{ tournament.get_tournament_type_display }}</span>
+                                </div>
+                                
+                                <!-- Prize & Slots -->
+                                <div class="d-flex justify-content-between align-items-center my-3 py-2" style="border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+                                    <div>
+                                        <div class="prize-tag"><i class="fas fa-trophy me-1"></i>₹{{ tournament.prize_pool }}</div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Prize Pool</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="text-white fw-bold">{{ tournament.total_slots }}</div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Total Slots</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Slots Progress -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted" style="font-size:0.75rem;">Slots Filled</span>
+                                        <span class="slots-left text-white fw-bold" style="font-size:0.75rem;">{{ tournament.slots_left }} left</span>
+                                    </div>
+                                    <div class="slot-bar">
+                                        <div class="slot-fill {% if tournament.fill_percentage > 80 %}danger{% endif %}" style="width:{{ tournament.fill_percentage }}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Date/Time -->
+                                <div class="d-flex gap-2 mb-3 text-muted flex-wrap" style="font-size:0.8rem;">
+                                    <span><i class="fas fa-calendar me-1"></i>{{ tournament.start_date|date:"d M Y" }}</span>
+                                    <span><i class="fas fa-clock me-1"></i>{{ tournament.start_date|date:"h:i A" }}</span>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="d-grid gap-2">
+                                    {% if user.is_authenticated and tournament.registration_open %}
+                                    <a href="{% url 'register_tournament' tournament.pk %}" class="btn btn-neon">
+                                        <i class="fas fa-gamepad me-2"></i>Register Now
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'tournament_detail' tournament.pk %}" class="btn btn-outline-neon">
+                                        <i class="fas fa-eye me-2"></i>View Details
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if tournaments.has_other_pages %}
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if tournaments.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ tournaments.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        
+                        <li class="page-item active"><a class="page-link" href="#">Page {{ tournaments.number }} of {{ tournaments.paginator.num_pages }}</a></li>
+                        
+                        {% if tournaments.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ tournaments.next_page_number }}">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ tournaments.paginator.num_pages }}">Last</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-5 card-gaming">
+                    <i class="fas fa-search" style="font-size:3rem;color:rgba(255,255,255,0.2);margin-bottom:1rem;display:block;"></i>
+                    <h4 class="text-muted">No tournaments found</h4>
+                    <p class="text-muted">Try adjusting your filters</p>
+                    <a href="{% url 'tournaments_list' %}" class="btn btn-outline-neon mt-3">Clear Filters</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

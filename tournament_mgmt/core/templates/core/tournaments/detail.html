@@ -1,0 +1,303 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ tournament.title }} - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner" style="padding:40px 0 30px;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="page-banner-title mb-2">{{ tournament.title }}</h1>
+                <p class="text-muted"><i class="fas fa-gamepad me-2"></i>{{ tournament.game.display_name }} • {{ tournament.get_tournament_type_display }}</p>
+            </div>
+            <div class="text-end">
+                <div class="text-neon-yellow" style="font-size:1.8rem;font-weight:700;">₹{{ tournament.prize_pool }}</div>
+                <div class="text-muted small">Total Prize Pool</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Info -->
+            <div class="col-lg-8">
+                <!-- Status Card -->
+                <div class="card-gaming p-4 mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">Tournament Status</span>
+                                <div class="status-badge status-{{ tournament.status }} mt-2" style="display:inline-block;">
+                                    {% if tournament.status == 'LIVE' %}🔴{% elif tournament.status == 'UPCOMING' %}⏳{% else %}✅{% endif %}
+                                    {{ tournament.get_status_display }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">Entry Fee</span>
+                                <div class="text-neon-yellow fw-bold mt-2">
+                                    {% if tournament.is_free %}FREE ENTRY 🎉{% else %}₹{{ tournament.entry_fee }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Key Details -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">📋 Tournament Details</h4>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">Start Date & Time</span>
+                                <div class="text-white fw-bold mt-2">{{ tournament.start_date|date:"d M Y, h:i A" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">End Date & Time</span>
+                                <div class="text-white fw-bold mt-2">{{ tournament.end_date|date:"d M Y, h:i A" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">Registration Closes</span>
+                                <div class="text-white fw-bold mt-2">{{ tournament.registration_deadline|date:"d M Y, h:i A" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <span class="text-muted small">Tournament Type</span>
+                                <div class="text-white fw-bold mt-2">{{ tournament.get_tournament_type_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slots Info -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">👥 Registration Slots</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="text-neon-green fw-bold fs-5">{{ tournament.slots_left }} slots left</span>
+                            <span class="text-muted ms-2">of {{ tournament.total_slots }} total</span>
+                        </div>
+                        <div class="fw-bold">{{ tournament.fill_percentage }}% full</div>
+                    </div>
+                    <div class="slot-bar" style="height:10px;">
+                        <div class="slot-fill {% if tournament.fill_percentage > 80 %}danger{% endif %}" style="width:{{ tournament.fill_percentage }}%;height:10px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Prize Distribution -->
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">🏆 Prize Distribution</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,165,0,0.1));">
+                                <div class="rank-badge rank-1 mb-2">🥇 1st</div>
+                                <div class="text-neon-yellow fw-bold">₹{{ tournament.first_prize|floatformat:0 }}</div>
+                                <div class="text-muted small">First Prize</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background:linear-gradient(135deg,rgba(192,192,192,0.15),rgba(158,158,158,0.1));">
+                                <div class="rank-badge rank-2 mb-2">🥈 2nd</div>
+                                <div class="text-light fw-bold">₹{{ tournament.second_prize|floatformat:0 }}</div>
+                                <div class="text-muted small">Second Prize</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background:linear-gradient(135deg,rgba(205,127,50,0.15),rgba(160,82,45,0.1));">
+                                <div class="rank-badge rank-3 mb-2">🥉 3rd</div>
+                                <div class="text-light fw-bold">₹{{ tournament.third_prize|floatformat:0 }}</div>
+                                <div class="text-muted small">Third Prize</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rules -->
+                {% if tournament.rules %}
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">📖 Tournament Rules</h4>
+                    <div class="text-muted">{{ tournament.rules|linebreaks }}</div>
+                </div>
+                {% endif %}
+                
+                <!-- Game Map -->
+                {% if tournament.map_name %}
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3">🗺️ Game Map</h4>
+                    <div class="text-white">{{ tournament.map_name }}</div>
+                </div>
+                {% endif %}
+                
+                <!-- Room Details (for admins/approved users) -->
+                {% if tournament.room_id and user.is_authenticated %}
+                <div class="card-gaming p-4 mb-4" style="border-color:rgba(57,255,20,0.3);">
+                    <h4 class="mb-3 text-neon-green">🔑 Room Details</h4>
+                    {% if user_registration.registration_status == 'APPROVED' %}
+                    <div class="mb-3">
+                        <span class="text-muted small">Room ID</span>
+                        <div class="d-flex justify-content-between align-items-center mt-2 p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <span class="text-white fw-bold">{{ tournament.room_id }}</span>
+                            <button class="btn btn-sm btn-outline-neon" data-copy="{{ tournament.room_id }}">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-muted small">Room Password</span>
+                        <div class="d-flex justify-content-between align-items-center mt-2 p-2 rounded" style="background:rgba(255,255,255,0.02);">
+                            <span class="text-white fw-bold">{{ tournament.room_password }}</span>
+                            <button class="btn btn-sm btn-outline-neon" data-copy="{{ tournament.room_password }}">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted small">Room details will be shared after your registration is approved.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Leaderboard -->
+                {% if results %}
+                <div class="card-gaming p-4">
+                    <h4 class="mb-3">🏆 Top Performers</h4>
+                    <div class="table-responsive">
+                        <table class="table table-gaming">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th class="text-end">Kills</th>
+                                    <th class="text-end">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td><span class="rank-badge rank-{{ result.rank|add:0 }}">{{ result.rank }}</span></td>
+                                    <td class="fw-bold">{{ result.registration.full_name }}</td>
+                                    <td class="text-muted">{{ result.registration.team_name|default:"Solo" }}</td>
+                                    <td class="text-end">{{ result.kills }}</td>
+                                    <td class="text-end text-neon-green fw-bold">{{ result.points }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Registration Card -->
+                {% if user.is_authenticated %}
+                {% if user_registered %}
+                <div class="card-gaming p-4 mb-4" style="border-color:rgba(57,255,20,0.3);">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-check-circle text-neon-green" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
+                        <h5 class="text-neon-green">You're Registered! ✅</h5>
+                    </div>
+                    <div class="bg-dark p-3 rounded mb-3 border border-neon-green">
+                        <div class="text-muted small">Registration Number</div>
+                        <div class="text-white fw-bold">{{ user_registration.registration_number }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted small">Status</span>
+                        <div class="status-pill pill-{{ user_registration.registration_status }} mt-2">{{ user_registration.get_registration_status_display }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-muted small">Payment Status</span>
+                        <div class="status-pill pill-{{ user_registration.payment_status }} mt-2">{{ user_registration.get_payment_status_display }}</div>
+                    </div>
+                    <a href="{% url 'registration_detail_user' user_registration.pk %}" class="btn btn-outline-neon w-100">
+                        View Registration Details
+                    </a>
+                </div>
+                {% elif tournament.registration_open %}
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3 text-center">🎮 Ready to Compete?</h4>
+                    <p class="text-muted text-center small mb-3">Join this tournament and compete with other gamers</p>
+                    <a href="{% url 'register_tournament' tournament.pk %}" class="btn btn-neon w-100 py-3 fw-bold mb-3">
+                        <i class="fas fa-gamepad me-2"></i>Register Now
+                    </a>
+                    <p class="text-muted text-center" style="font-size:0.75rem;">
+                        Entry fee: <strong>{% if tournament.is_free %}FREE{% else %}₹{{ tournament.entry_fee }}{% endif %}</strong>
+                    </p>
+                </div>
+                {% else %}
+                <div class="card-gaming p-4 mb-4" style="border-color:rgba(255,0,110,0.3);">
+                    <div class="text-center">
+                        <i class="fas fa-ban text-neon-pink" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
+                        <h5 class="text-neon-pink">Registration Closed</h5>
+                        <p class="text-muted small">This tournament is no longer accepting registrations</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3 text-center">Login to Register</h4>
+                    <p class="text-muted text-center small mb-3">Sign in to your account to register for this tournament</p>
+                    <a href="{% url 'login' %}?next={% url 'tournament_detail' tournament.pk %}" class="btn btn-neon w-100 py-2 mb-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{% url 'signup' %}" class="btn btn-outline-neon w-100 py-2">
+                        <i class="fas fa-user-plus me-2"></i>Sign Up
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Payment UPI QR -->
+                {% if not tournament.is_free and not user_registered %}
+                <div class="card-gaming p-4 mb-4">
+                    <h5 class="mb-3">💳 Payment Method</h5>
+                    <div class="p-3 rounded mb-2" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);">
+                        <div class="text-muted small mb-2">UPI ID</div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-white fw-bold">{{ tournament.upi_id }}</span>
+                            <button class="btn btn-sm btn-outline-neon" data-copy="{{ tournament.upi_id }}">Copy</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="font-size:0.75rem;">Send ₹{{ tournament.entry_fee }} to the above UPI ID and upload the screenshot while registering</p>
+                </div>
+                {% endif %}
+                
+                <!-- Additional Info -->
+                <div class="card-gaming p-4">
+                    <h5 class="mb-3">ℹ️ Quick Info</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="text-muted small"><i class="fas fa-gamepad me-2"></i>Game:</span>
+                            <span class="text-white fw-bold d-block ms-4">{{ tournament.game.display_name }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small"><i class="fas fa-users me-2"></i>Type:</span>
+                            <span class="text-white fw-bold d-block ms-4">{{ tournament.get_tournament_type_display }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small"><i class="fas fa-trophy me-2"></i>Prize Pool:</span>
+                            <span class="text-neon-yellow fw-bold d-block ms-4">₹{{ tournament.prize_pool }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small"><i class="fas fa-link me-2"></i>Slots:</span>
+                            <span class="text-white fw-bold d-block ms-4">{{ tournament.slots_left }} / {{ tournament.total_slots }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

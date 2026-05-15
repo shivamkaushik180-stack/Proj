@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Manage Games - OGTRMS
+{% endblock %}
+
+{% block content %}
+  <section class="admin-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h1 class="page-banner-title mb-0"><i class="fas fa-gamepad me-2"></i>Manage Games</h1>
+        <a href="{% url 'admin_game_add' %}" class="btn btn-neon"><i class="fas fa-plus me-2"></i>Add Game</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-padding">
+    <div class="container">
+      <div class="row g-4">
+        {% for game in games %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card-gaming p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="mb-0">{{ game.display_name }}</h5>
+                <span class="badge {% if game.is_active %}
+                    bg-success
+                  {% else %}
+                    bg-danger
+                  {% endif %}">
+                  {% if game.is_active %}
+                    Active
+                  {% else %}
+                    Inactive
+                  {% endif %}
+                </span>
+              </div>
+
+              <div class="mb-3">
+                <span class="text-muted small">Genre</span>
+                <div class="text-white fw-bold">{{ game.genre }}</div>
+              </div>
+
+              {% if game.image %}
+                <div class="mb-3">
+                  <img src="{{ game.image.url }}" alt="{{ game.display_name }}" class="img-fluid rounded" style="height:150px;object-fit:cover;width:100%;" />
+                </div>
+              {% endif %}
+
+              <div class="mb-3">
+                <span class="text-muted small">Description</span>
+                <p class="text-muted small mb-0">{{ game.description|truncatewords:15 }}</p>
+              </div>
+
+              <div class="mb-3">
+                <span class="text-muted small">Tournaments</span>
+                <div class="text-white fw-bold">{{ game.tournament_set.count }}</div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <a href="{% url 'admin_game_edit' game.id %}" class="btn btn-outline-neon btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+
+                <a href="{% url 'admin_game_delete' game.id %}" class="btn btn-danger-neon btn-sm"><i class="fas fa-trash me-1"></i>Delete</a>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="card-gaming p-5 text-center">
+              <p class="text-muted">
+                No games found. <a href="{% url 'admin_game_add' %}" class="text-neon">Add one now</a>
+              </p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Reports & Analytics - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="admin-header">
+    <div class="container">
+        <h1 class="page-banner-title mb-0"><i class="fas fa-chart-line me-2"></i>Reports & Analytics</h1>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <!-- Summary Stats -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(0,245,255,0.1);">
+                        <i class="fas fa-users text-neon"></i>
+                    </div>
+                    <span class="stat-num" data-count="{{ total_registrations }}">{{ total_registrations }}</span>
+                    <span class="stat-label">Total Registrations</span>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(57,255,20,0.1);">
+                        <i class="fas fa-check-circle text-neon-green"></i>
+                    </div>
+                    <span class="stat-num" data-count="{{ approved_registrations }}">{{ approved_registrations }}</span>
+                    <span class="stat-label">Approved</span>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,215,0,0.1);">
+                        <i class="fas fa-credit-card text-neon-yellow"></i>
+                    </div>
+                    <span class="stat-num">₹{{ total_revenue|floatformat:0 }}</span>
+                    <span class="stat-label">Total Revenue</span>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,0,110,0.1);">
+                        <i class="fas fa-hourglass text-neon-pink"></i>
+                    </div>
+                    <span class="stat-num" data-count="{{ pending_registrations }}">{{ pending_registrations }}</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="card-gaming p-4 mb-5">
+            <h4 class="mb-3"><i class="fas fa-download me-2"></i>Export Data</h4>
+            <div class="d-grid gap-2 d-sm-flex">
+                <a href="{% url 'admin_export_csv' %}" class="btn btn-neon flex-grow-1">
+                    <i class="fas fa-table me-2"></i>Export as CSV
+                </a>
+                <button class="btn btn-outline-neon flex-grow-1" disabled>
+                    <i class="fas fa-file-pdf me-2"></i>Export as PDF (Coming Soon)
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Statistics -->
+        <div class="card-gaming p-4 mb-5">
+            <h4 class="mb-3"><i class="fas fa-chart-bar me-2"></i>Game Statistics</h4>
+            <div class="table-responsive">
+                <table class="table table-gaming">
+                    <thead>
+                        <tr>
+                            <th>Game</th>
+                            <th class="text-end">Tournaments</th>
+                            <th class="text-end">Registrations</th>
+                            <th class="text-end">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in game_stats %}
+                        <tr>
+                            <td class="fw-bold">{{ stat.display_name }}</td>
+                            <td class="text-end">{{ stat.tournament_count }}</td>
+                            <td class="text-end">{{ stat.registration_count }}</td>
+                            <td class="text-end text-neon-yellow fw-bold">₹0</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <p class="text-muted">No data available</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly Trends -->
+<div class="card-gaming p-4">
+    <h4 class="mb-3">
+        <i class="fas fa-chart-line me-2"></i>
+        Monthly Registration Trends
+    </h4>
+
+    <div class="table-responsive">
+        <table class="table table-gaming">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th class="text-end">Registrations</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for month in monthly_revenue %}
+                <tr>
+                    <td class="fw-bold">{{ month.month }}</td>
+
+                    <td class="text-end">{{ month.count }}</td>
+
+                    <td style="min-width:220px;">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <div class="slot-bar w-100"
+                                 style="height:8px; background:#1a1a1a; border-radius:20px; overflow:hidden;">
+
+                                <div class="slot-fill"
+                                     style="height:8px;
+                                            background:#00f5ff;
+                                            width:{% widthratio month.count max_month_count 100 %}%;">
+                                </div>
+
+                            </div>
+
+                            <span class="fw-bold text-neon">
+                                {% widthratio month.count max_month_count 100 %}%
+                            </span>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">
+                        No Data Available
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% endblock %}

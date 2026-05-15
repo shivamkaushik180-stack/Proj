@@ -1,0 +1,125 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - OGTRMS{% endblock %}
+
+{% block content %}
+
+<!-- SIGNUP BACKGROUND WRAPPER -->
+<div class="signup-bg">
+
+<section class="page-banner py-5 text-center">
+    <div class="container">
+        <h1 class="page-banner-title text-white fw-bold">
+            <i class="fas fa-user-plus text-danger me-2"></i>
+            Join the Gaming Arena
+        </h1>
+        <p class="text-light">Create your account and start competing</p>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+
+                <div class="auth-card p-4 shadow-lg rounded">
+
+                    <!-- Heading -->
+                    <div class="text-center mb-4">
+                        <i class="fas fa-rocket text-danger fs-2"></i>
+                        <h3 class="mt-2 fw-bold">Create Account</h3>
+                        <p class="text-muted small">Join the gaming community</p>
+                    </div>
+
+                    <!-- Django Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Signup Form -->
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            {{ form.username }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mobile Number</label>
+                            {{ form.mobile }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            {{ form.password1 }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            {{ form.password2 }}
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100 fw-bold py-2">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Create Account
+                        </button>
+
+                    </form>
+
+                    <!-- Footer -->
+                    <p class="text-center mt-4 text-light">
+                        Already have an account?
+                        <a href="{% url 'login' %}" class="text-danger fw-bold text-decoration-none">
+                            Login
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+
+{% endblock %}

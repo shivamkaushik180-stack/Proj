@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Confirm Delete - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container text-center">
+        <h1 class="page-banner-title"><i class="fas fa-exclamation-triangle me-2 text-neon-pink"></i>Confirm Delete</h1>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card-gaming p-5 text-center">
+                    <i class="fas fa-trash" style="font-size:4rem;color:#ff006e;margin-bottom:1rem;display:block;opacity:0.7;"></i>
+                    
+                    <h3 class="text-white mb-2">Delete {{ type }}?</h3>
+                    
+                    <p class="text-muted mb-4">
+                        Are you sure you want to delete "<strong>{{ obj }}</strong>"? This action cannot be undone.
+                    </p>
+                    
+                    <div class="alert alert-danger alert-gaming mb-4">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning:</strong> All associated data may be lost.
+                    </div>
+                    
+                    <form method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger-neon px-5 py-2 me-2 fw-bold">
+                            <i class="fas fa-trash me-2"></i>Yes, Delete
+                        </button>
+                    </form>
+                    
+                    <a href="javascript:history.back()" class="btn btn-outline-neon px-5 py-2 fw-bold">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Manage Tournaments - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h1 class="page-banner-title mb-0">
+                <i class="fas fa-trophy me-2"></i>Manage Tournaments
+            </h1>
+
+            <a href="{% url 'admin_tournament_add' %}" class="btn btn-neon">
+                <i class="fas fa-plus me-2"></i>Add New Tournament
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+
+        <div class="card-gaming p-4">
+
+            <div class="table-responsive">
+                <table class="table table-gaming">
+
+                    <thead>
+                        <tr>
+                            <th>Tournament Name</th>
+                            <th>Game</th>
+                            <th>Status</th>
+                            <th>Entry Fee</th>
+                            <th>Prize Pool</th>
+                            <th>Registrations</th>
+                            <th>Start Date</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for tournament in tournaments %}
+                        <tr>
+
+                            <td class="fw-bold">
+                                {{ tournament.title }}
+                            </td>
+
+                            <td class="text-muted small">
+                                {{ tournament.game.display_name|default:"N/A" }}
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ tournament.status|slugify }}">
+                                    {{ tournament.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if tournament.entry_fee == 0 %}
+                                    <span class="badge bg-success">FREE</span>
+                                {% else %}
+                                    ₹{{ tournament.entry_fee }}
+                                {% endif %}
+                            </td>
+
+                            <td class="text-neon-yellow fw-bold">
+                                ₹{{ tournament.prize_pool }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ tournament.registered_slots }}/{{ tournament.total_slots }}
+                                </span>
+                            </td>
+
+                            <td class="text-muted small">
+                                {{ tournament.start_date|date:"d M Y" }}
+                            </td>
+
+                            <td class="text-end">
+
+                                <div class="btn-group btn-group-sm">
+
+                                    <!-- Edit -->
+                                    <a href="{% url 'admin_tournament_edit' tournament.pk %}"
+                                       class="btn btn-outline-neon"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <!-- Winner Button -->
+                                    {% if tournament.status != 'COMPLETED' %}
+                                    <a href="{% url 'admin_announce_winner' tournament.pk %}"
+                                       class="btn btn-success"
+                                       title="Announce Winner">
+                                        <i class="fas fa-trophy"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Delete -->
+                                    <form method="post"
+                                          action="{% url 'admin_tournament_delete' tournament.pk %}"
+                                          style="display:inline;"
+                                          onsubmit="return confirm('Delete this tournament?');">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-danger-neon"
+                                                title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                No tournaments found.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if tournaments.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+
+                    {% if tournaments.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ tournaments.previous_page_number }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ tournaments.number }}
+                        </span>
+                    </li>
+
+                    {% if tournaments.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ tournaments.next_page_number }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Profile - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container">
+        <h1 class="page-banner-title"><i class="fas fa-user me-2"></i>My Profile</h1>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Profile Form -->
+            <div class="col-lg-8">
+                <div class="card-gaming p-4">
+                    <h3 class="mb-4">📝 Edit Profile</h3>
+                    
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mobile Number</label>
+                            {{ form.mobile }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Bio</label>
+                            {{ form.bio }}
+                            <small class="text-muted d-block">Tell us about yourself (max 500 characters)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Profile Picture</label>
+                            {{ form.avatar }}
+                            <small class="text-muted d-block">Recommended: Square image, min 200x200px</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-neon py-2 fw-bold">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Profile Sidebar -->
+            <div class="col-lg-4">
+                <!-- Avatar & Basic Info -->
+                <div class="card-gaming p-4 text-center mb-4">
+                    <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:3rem;color:#000;">
+                        {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                        {% else %}
+                        {{ user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    
+                    <h4 class="text-white mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted small mb-2">@{{ user.username }}</p>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-success">Active Member</span>
+                    </div>
+                    
+                    <div class="row g-2 text-center">
+                        <div class="col-6">
+                            <div class="stat-num text-neon-yellow">{{ profile.total_wins }}</div>
+                            <div class="text-muted" style="font-size:0.75rem;">Wins</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-num text-neon-green">{{ profile.total_points }}</div>
+                            <div class="text-muted" style="font-size:0.75rem;">Points</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Settings -->
+                <div class="card-gaming p-4 mb-4">
+                    <h5 class="mb-3">🔒 Account Settings</h5>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="text-muted small">Email:</span>
+                            <div class="text-white fw-bold">{{ user.email }}</div>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small">Mobile:</span>
+                            <div class="text-white fw-bold">{{ profile.mobile|default:"Not set" }}</div>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-muted small">Member Since:</span>
+                            <div class="text-white fw-bold">{{ user.date_joined|date:"d M Y" }}</div>
+                        </li>
+                        <li>
+                            <span class="text-muted small">Last Login:</span>
+                            <div class="text-white fw-bold">{{ user.last_login|date:"d M Y, h:i A" }}</div>
+                        </li>
+                    </ul>
+                    
+                    <hr class="my-3" style="border-color:rgba(255,255,255,0.1);">
+                    
+                    <a href="{% url 'change_password_user' %}" class="btn btn-outline-neon w-100">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </a>
+                </div>
+
+                <!-- Verification Status -->
+                <div class="card-gaming p-4">
+                    <h5 class="mb-3">✅ Verification Status</h5>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-envelope-circle-check text-neon-green me-2"></i>
+                            <span class="text-white small">Email Verified</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-mobile-alt text-neon-green me-2"></i>
+                            <span class="text-white small">Mobile Verified</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-user-check text-neon-green me-2"></i>
+                            <span class="text-white small">Profile Complete</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

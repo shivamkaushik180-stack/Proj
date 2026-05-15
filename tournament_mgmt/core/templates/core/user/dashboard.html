@@ -1,0 +1,206 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - OGTRMS{% endblock %}
+
+{% block content %}
+
+<section class="page-banner">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="page-banner-title mb-2">Welcome, {{ user.first_name|default:user.username }}! 👋</h1>
+                <p class="text-muted">Manage your tournaments, registrations and profile</p>
+            </div>
+            <a href="{% url 'tournaments_list' %}" class="btn btn-neon">
+                <i class="fas fa-trophy me-2"></i>Browse Tournaments
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card" style="--accent-color:var(--neon-cyan);">
+                    <div class="stat-icon" style="background:rgba(0,245,255,0.1);">
+                        <i class="fas fa-registered text-neon"></i>
+                    </div>
+                    <span class="stat-num">{{ total_registrations }}</span>
+                    <span class="stat-label">Total Registrations</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="--accent-color:var(--neon-green);">
+                    <div class="stat-icon" style="background:rgba(57,255,20,0.1);">
+                        <i class="fas fa-check-circle text-neon-green"></i>
+                    </div>
+                    <span class="stat-num">{{ approved_count }}</span>
+                    <span class="stat-label">Approved</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="--accent-color:var(--neon-yellow);">
+                    <div class="stat-icon" style="background:rgba(255,215,0,0.1);">
+                        <i class="fas fa-hourglass text-neon-yellow"></i>
+                    </div>
+                    <span class="stat-num">{{ pending_count }}</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="--accent-color:var(--neon-pink);">
+                    <div class="stat-icon" style="background:rgba(255,0,110,0.1);">
+                        <i class="fas fa-trophy text-neon-pink"></i>
+                    </div>
+                    <span class="stat-num">{{ my_wins|length }}</span>
+                    <span class="stat-label">Wins</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Upcoming Registrations -->
+                {% if upcoming %}
+                <div class="card-gaming p-4 mb-4">
+                    <h4 class="mb-3"><i class="fas fa-calendar me-2 text-neon"></i>Upcoming Tournaments</h4>
+                    <div class="table-responsive">
+                        <table class="table table-gaming">
+                            <thead>
+                                <tr>
+                                    <th>Tournament</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in upcoming %}
+                                <tr>
+                                    <td class="fw-bold">{{ reg.tournament.title }}</td>
+                                    <td class="text-muted small">{{ reg.tournament.start_date|date:"d M Y" }}</td>
+                                    <td>
+                                        <span class="status-pill pill-{{ reg.registration_status }}">
+                                            {{ reg.get_registration_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'registration_detail_user' reg.pk %}" class="btn btn-sm btn-outline-neon">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Recent Registrations -->
+                <div class="card-gaming p-4">
+                    <h4 class="mb-3"><i class="fas fa-list me-2 text-neon"></i>Recent Registrations</h4>
+                    {% if registrations %}
+                    <div class="table-responsive">
+                        <table class="table table-gaming">
+                            <thead>
+                                <tr>
+                                    <th>Reg. No.</th>
+                                    <th>Tournament</th>
+                                    <th>Reg. Status</th>
+                                    <th>Payment</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in registrations %}
+                                <tr>
+                                    <td class="text-neon fw-bold" style="font-size:0.9rem;">{{ reg.registration_number }}</td>
+                                    <td>
+                                        <div class="fw-bold">{{ reg.tournament.title|truncatewords:3 }}</div>
+                                        <span class="text-muted small">{{ reg.tournament.game.display_name }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="status-pill pill-{{ reg.registration_status }}">
+                                            {{ reg.get_registration_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="status-pill pill-{{ reg.payment_status }}">
+                                            {{ reg.get_payment_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'registration_detail_user' reg.pk %}" class="btn btn-sm btn-outline-neon">Details</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{% url 'my_registrations' %}" class="btn btn-outline-neon mt-3">View All Registrations</a>
+                    {% else %}
+                    <p class="text-muted">No registrations yet. <a href="{% url 'tournaments_list' %}" class="text-neon">Browse tournaments</a></p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Recent Notifications -->
+                <div class="card-gaming p-4 mb-4">
+                    <h5 class="mb-3"><i class="fas fa-bell me-2 text-neon"></i>Notifications</h5>
+                    {% if notifications %}
+                    <div style="max-height:400px;overflow-y:auto;">
+                        {% for notif in notifications %}
+                        <div class="mb-3 pb-2" style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="badge bg-{{ notif.get_notification_type_display|lower }}-neon mb-1">{{ notif.notification_type }}</span>
+                                {% if not notif.is_read %}<span class="badge bg-info">New</span>{% endif %}
+                            </div>
+                            <h6 class="text-white small mb-1">{{ notif.title }}</h6>
+                            <p class="text-muted" style="font-size:0.8rem;">{{ notif.message|truncatewords:15 }}</p>
+                            <span class="text-muted" style="font-size:0.7rem;">{{ notif.created_at|timesince }} ago</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-neon btn-sm w-100 mt-3">View All</a>
+                    {% else %}
+                    <p class="text-muted small">No new notifications</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="card-gaming p-4">
+                    <h5 class="mb-3">⚡ Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'my_registrations' %}" class="text-decoration-none">
+                                <i class="fas fa-list me-2 text-neon"></i>My Registrations
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'user_profile' %}" class="text-decoration-none">
+                                <i class="fas fa-user me-2 text-neon"></i>Edit Profile
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'change_password_user' %}" class="text-decoration-none">
+                                <i class="fas fa-key me-2 text-neon"></i>Change Password
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'leaderboard' %}" class="text-decoration-none">
+                                <i class="fas fa-crown me-2 text-neon-yellow"></i>Leaderboard
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
